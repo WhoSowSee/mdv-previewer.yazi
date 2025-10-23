@@ -54,7 +54,8 @@ require("mdv-previewer"):setup({
   theme = "kanagawa",
   code_theme = "tokyonight",
 
-  -- If not specified, uses the default safe arguments.
+  -- It is not recommended to use this parameter
+  -- If not specified, uses the default safe arguments
   -- Cannot use --monitor and --config-file
   -- The priority of custom_args is higher than theme and code_theme
   -- If --cols/--columns is not specified, it defaults to the width of the preview pane
