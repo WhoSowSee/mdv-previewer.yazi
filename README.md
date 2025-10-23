@@ -1,0 +1,64 @@
+<h1 align="center">🗒️mdv-previewer.yazi</h1>
+<p align="center">
+  <b>Fast, themeable Markdown viewer for the terminal</b><br>
+  <i>View Markdown without leaving yazi</i>
+</p>
+
+> [!TIP]
+> **Russian version:** [README-RU.md](README-RU.md)
+
+> [!IMPORTANT]
+> Requires Yazi v25.5.28+\
+> Requires [`mdv`](https://github.com/WhoSowSee/mdv) in `PATH`
+
+## Installation
+
+```sh
+ya pkg add WhoSowSee/mdv-previewer
+```
+
+```sh
+# Manual installation
+
+# Linux / macOS
+git clone https://github.com/WhoSowSee/mdv-previewer.yazi.git ~/.config/yazi/plugins/mdv-previewer.yazi
+
+# Windows
+git clone https://github.com/WhoSowSee/mdv-previewer.yazi.git "$env:APPDATA\yazi\config\plugins\mdv-previewer.yazi"
+```
+
+## Usage
+
+### Register the previewer
+
+Add the plugin to `yazi.toml` (adjust the masks if necessary):
+
+```toml
+[[plugin.prepend_previewers]]
+name = "*.{md,markdown,txt}"
+run = "mdv-previewer"
+
+[[plugin.prepend_preloaders]]
+name = "*.{md,markdown,txt}"
+run = "mdv-previewer"
+```
+
+### Configure options (optional)
+
+Example block in `init.lua`:
+
+```lua
+require("mdv-previewer"):setup({
+  theme = "kanagawa",
+  code_theme = "tokyonight",
+
+  -- If not specified, uses the default safe arguments.
+  -- Cannot use --monitor and --config-file
+  -- The priority of custom_args is higher than theme and code_theme
+  -- If --cols/--columns is not specified, it defaults to the width of the preview pane
+  custom_args = "--style-code-block simple --wrap char --link-style inline",
+
+  -- Number of lines per scroll step. Can take "auto" to use the default value
+  scroll_step = 3,
+})
+```
