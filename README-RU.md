@@ -11,6 +11,8 @@
 > Необходим Yazi v25.5.28+\
 > Необходим [`mdv`](https://github.com/WhoSowSee/mdv) в `PATH`
 
+https://github.com/user-attachments/assets/c985d2cb-1bc6-43cb-aef7-0596949d1f29
+
 ## Установка
 
 ```sh
