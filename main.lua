@@ -1,4 +1,4 @@
--- @since 25.5.28
+--- @since 25.5.28
 
 local M = {}
 
@@ -17,7 +17,7 @@ local options = ya.sync(function(state, update)
 	}
 end)
 
-local emit = ya.emit or ya.manager_emit or ya.mgr_emit
+local emit = ya.emit
 
 local MEM = { key = nil, lines = nil, total = 0, last_skip = -1, last_w = 0, last_h = 0 }
 
@@ -34,7 +34,7 @@ end
 
 local function collect_tokens(acc, value)
 	if type(value) ~= "string" then return end
-	local input = value:gsub(",", " ")
+	local input = value
 	local i, len = 1, #input
 	while i <= len do
 		while i <= len and input:sub(i, i):match("%s") do i = i + 1 end
@@ -66,15 +66,14 @@ local function strip_monitor_args(args)
 	local filtered, i = {}, 1
 	while i <= #args do
 		local token = args[i]
+		local drop = token == "-m" or token == "--monitor" or token:match("^%-%-monitor=")
 		if token == "--monitor" then
 			local next_token = args[i + 1]
 			if next_token and not next_token:match("^%-") then
 				i = i + 1
 			end
-		elseif token:match("^%-%-monitor=") then
-		else
-			filtered[#filtered + 1] = token
 		end
+		if not drop then filtered[#filtered + 1] = token end
 		i = i + 1
 	end
 	return filtered
@@ -150,13 +149,17 @@ local function build_mdv_args(width, theme, code_theme, custom_args)
 
 	local has_no_config, has_width, has_theme, has_code_theme = false, false, false, false
 	for _, token in ipairs(args) do
+		local is_width = token == "-c" or token == "--cols" or token:match("^%-c=") or token:match("^%-%-cols=")
+		local is_theme = token == "--theme" or token == "-t" or token:match("^%-%-theme=") or token:match("^%-t=")
+		local is_code_theme = token == "--code-theme" or token == "-T"
+			or token:match("^%-%-code%-theme=") or token:match("^%-T=")
 		if token == "--no-config" then
 			has_no_config = true
-		elseif not has_width and (token == "-c" or token == "--cols" or token:match("^%-c=") or token:match("^%-%-cols=")) then
+		elseif not has_width and is_width then
 			has_width = true
-		elseif not has_theme and (token == "--theme" or token == "-t" or token:match("^%-%-theme=") or token:match("^%-t=")) then
+		elseif not has_theme and is_theme then
 			has_theme = true
-		elseif not has_code_theme and (token == "--code-theme" or token == "-T" or token:match("^%-%-code%-theme=") or token:match("^%-T=")) then
+		elseif not has_code_theme and is_code_theme then
 			has_code_theme = true
 		end
 	end
@@ -205,8 +208,8 @@ local function show(job, widget)
 end
 
 
-function M:preload(job)
-	local opts = options() or {}
+local function render_to_cache(job, opts)
+	opts = opts or options() or {}
 	local theme = opts.theme
 	local code_theme = opts.code_theme
 	local cache = cache_url(job, opts)
@@ -219,8 +222,7 @@ function M:preload(job)
 
 	local src = fs.cha(job.file.url)
 	if src and src.len == 0 then
-		fs.write(cache, "")
-		return true
+		return fs.write(cache, "")
 	end
 
 	local width = job.area and job.area.w or 0
@@ -232,17 +234,17 @@ function M:preload(job)
 	for _, arg in ipairs(cmd_args) do
 		command:arg(arg)
 	end
-	local out = (command
+	local out, err = command
 		:stdout(Command.PIPED)
 		:stderr(Command.PIPED)
-		:output())
+		:output()
 
 	if not out then
-		return true, ui.Text("mdv: failed to start"):area(job.area)
+		return true, tostring(err or "mdv: failed to start")
 	elseif out.status and not out.status.success then
 		local msg = (out.stderr and out.stderr ~= "") and out.stderr or "mdv: rendering error"
 		fs.write(cache, msg)
-		return true, ui.Text(msg):area(job.area)
+		return true, msg
 	end
 
 	local normalized = strip_osc8(out.stdout)
@@ -250,7 +252,11 @@ function M:preload(job)
 	return fs.write(cache, normalized)
 end
 
-function M:load_into_mem(job)
+function M.preload(_, job)
+	return render_to_cache(job)
+end
+
+function M.load_into_mem(_, job)
 	local function build_prefixes_replay(blob)
 		local prefixes, acc, ln = { "" }, {}, 1
 		for line in (blob .. "\n"):gmatch("([^\n]*)\n") do
@@ -346,9 +352,11 @@ function M:peek(job)
 	local area, file = job.area, job.file
 	local skip = math.max(0, job.skip or 0)
 
-	local _, err_widget = self:preload(job)
-	if err_widget then
-		return show(job, err_widget)
+	local complete, err = self:preload(job)
+	if err then
+		return show(job, ui.Text(tostring(err)):area(area))
+	elseif not complete then
+		return
 	end
 
 	local mem = self:load_into_mem(job)
@@ -369,7 +377,7 @@ function M:peek(job)
 	mem.last_w, mem.last_h = area.w, area.h
 end
 
-function M:seek(job)
+function M.seek(_, job)
 	local h = cx.active and cx.active.current and cx.active.current.hovered
 	if not (h and h.url == job.file.url and emit) then
 		return
@@ -392,7 +400,7 @@ function M:seek(job)
 	if next_skip ~= current_skip then emit("peek", { next_skip, only_if = job.file.url }) end
 end
 
-function M:setup(user)
+function M.setup(_, user)
 	user = user or {}
 	local theme = user.theme
 	if theme == "" then theme = nil end -- Will be removed in newer versions of mdv
@@ -413,14 +421,6 @@ function M:setup(user)
 		custom_args = custom_args,
 		scroll_step = scroll_step,
 	})
-	if ya and ya.dbg then
-		local args_info = custom_args and table.concat(custom_args, " ") or "default"
-		local step_info = scroll_step and tostring(scroll_step) or "auto"
-		local theme_info = theme or "mdv-default"
-		local code_theme_info = code_theme or "mdv-default"
-		ya.dbg(string.format("mdv-preview: theme '%s', code_theme '%s', custom args %s, scroll_step %s", theme_info,
-			code_theme_info, args_info, step_info))
-	end
 end
 
 return M

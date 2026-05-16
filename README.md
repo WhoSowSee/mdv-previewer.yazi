@@ -37,11 +37,11 @@ Add the plugin to `yazi.toml` (adjust the masks if necessary):
 
 ```toml
 [[plugin.prepend_previewers]]
-name = "*.{md,markdown,txt}"
+url = "*.{md,markdown,txt}"
 run = "mdv-previewer"
 
 [[plugin.prepend_preloaders]]
-name = "*.{md,markdown,txt}"
+url = "*.{md,markdown,txt}"
 run = "mdv-previewer"
 ```
 
@@ -59,7 +59,7 @@ require("mdv-previewer"):setup({
   -- Cannot use --monitor and --config-file
   -- The priority of custom_args is higher than theme and code_theme
   -- If --cols/--columns is not specified, it defaults to the width of the preview pane
-  custom_args = "--style-code-block simple --wrap char --link-style inline",
+  custom_args = "--code-block-style simple --wrap char --link-style inline",
 
   -- Number of lines per scroll step. Can take "auto" to use the default value
   scroll_step = 3,

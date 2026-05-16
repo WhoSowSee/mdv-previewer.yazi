@@ -37,11 +37,11 @@ git clone https://github.com/WhoSowSee/mdv-previewer.yazi.git "$env:APPDATA\yazi
 
 ```toml
 [[plugin.prepend_previewers]]
-name = "*.{md,markdown,txt}"
+url = "*.{md,markdown,txt}"
 run = "mdv-previewer"
 
 [[plugin.prepend_preloaders]]
-name = "*.{md,markdown,txt}"
+url = "*.{md,markdown,txt}"
 run = "mdv-previewer"
 ```
 
@@ -59,7 +59,7 @@ require("mdv-previewer"):setup({
   -- Невозможно использовать --monitor и --config-file
   -- Приоритет custom_args выше, чем theme и code_theme
   -- Если не указана -c/--cols, то берется ширина превью панели
-  custom_args = "--style-code-block simple --wrap char --link-style inline",
+  custom_args = "--code-block-style simple --wrap char --link-style inline",
 
   -- Количество строк на один шаг прокрутки. Может принимать "auto", чтобы использовать значение по умолчанию
   scroll_step = 3,
