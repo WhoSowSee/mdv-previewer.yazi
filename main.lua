@@ -32,12 +32,13 @@ local function strip_osc8(s)
 		:gsub("\r", "")
 end
 
-local function strip_monitor_args(args)
+local function strip_unsupported_args(args)
 	if not args[1] then return args end
 	local filtered, i = {}, 1
 	while i <= #args do
 		local token = args[i]
 		local drop = token == "-m" or token == "--monitor" or token:match("^%-%-monitor=")
+			or token == "-H" or token == "--html" or token:match("^%-%-html=")
 		if token == "--monitor" then
 			local next_token = args[i + 1]
 			if next_token and not next_token:match("^%-") then
@@ -60,7 +61,7 @@ local function normalize_custom_args(input)
 		if value ~= "" then args[#args + 1] = value end
 	end
 
-	args = strip_monitor_args(args)
+	args = strip_unsupported_args(args)
 	return args[1] and args or nil, false
 end
 
