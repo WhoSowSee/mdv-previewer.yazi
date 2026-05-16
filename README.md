@@ -58,8 +58,10 @@ require("mdv-previewer"):setup({
   -- If not specified, uses the default safe arguments
   -- Cannot use --monitor and --config-file
   -- The priority of custom_args is higher than theme and code_theme
-  -- If --cols/--columns is not specified, it defaults to the width of the preview pane
-  custom_args = "--code-block-style simple --wrap char --link-style inline",
+  custom_args = {
+    "--cols", "64",
+    "--custom-theme", "h1=173,22,124",
+  },
 
   -- Number of lines per scroll step. Can take "auto" to use the default value
   scroll_step = 3,

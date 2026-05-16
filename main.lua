@@ -32,35 +32,6 @@ local function strip_osc8(s)
 		:gsub("\r", "")
 end
 
-local function collect_tokens(acc, value)
-	if type(value) ~= "string" then return end
-	local input = value
-	local i, len = 1, #input
-	while i <= len do
-		while i <= len and input:sub(i, i):match("%s") do i = i + 1 end
-		if i > len then break end
-		local ch = input:sub(i, i)
-		local token
-		if ch == '"' or ch == "'" then
-			local j = i + 1
-			while j <= len and input:sub(j, j) ~= ch do j = j + 1 end
-			if j <= len then
-				token = input:sub(i + 1, j - 1)
-				i = j + 1
-			else
-				token = input:sub(i + 1)
-				i = len + 1
-			end
-		else
-			local j = i
-			while j <= len and not input:sub(j, j):match("%s") do j = j + 1 end
-			token = input:sub(i, j - 1)
-			i = j
-		end
-		if token ~= "" then acc[#acc + 1] = token end
-	end
-end
-
 local function strip_monitor_args(args)
 	if not args[1] then return args end
 	local filtered, i = {}, 1
@@ -80,16 +51,17 @@ local function strip_monitor_args(args)
 end
 
 local function normalize_custom_args(input)
+	if input == nil then return nil, false end
+	if type(input) ~= "table" then return nil, true end
+
 	local args = {}
-	if type(input) == "string" then
-		collect_tokens(args, input)
-	elseif type(input) == "table" then
-		for _, value in ipairs(input) do
-			collect_tokens(args, value)
-		end
+	for _, value in ipairs(input) do
+		if type(value) ~= "string" then return nil, true end
+		if value ~= "" then args[#args + 1] = value end
 	end
+
 	args = strip_monitor_args(args)
-	return args[1] and args or nil
+	return args[1] and args or nil, false
 end
 
 local function normalize_scroll_step(value)
@@ -405,8 +377,16 @@ function M.setup(_, user)
 	local theme = user.theme
 	if theme == "" then theme = nil end -- Will be removed in newer versions of mdv
 	local code_theme = user.code_theme
-	local custom_args = normalize_custom_args(user.custom_args)
+	local custom_args, invalid_custom_args = normalize_custom_args(user.custom_args)
 	local scroll_step, invalid_scroll_step = normalize_scroll_step(user.scroll_step)
+	if invalid_custom_args and ya and ya.notify then
+		ya.notify {
+			title = "mdv previewer",
+			content = "Invalid value for `custom_args`",
+			timeout = 2,
+			level = "warn",
+		}
+	end
 	if invalid_scroll_step and ya and ya.notify then
 		ya.notify {
 			title = "mdv previewer",

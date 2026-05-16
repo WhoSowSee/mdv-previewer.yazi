@@ -58,8 +58,10 @@ require("mdv-previewer"):setup({
   -- Если не указано, используются встроенные безопасные параметры
   -- Невозможно использовать --monitor и --config-file
   -- Приоритет custom_args выше, чем theme и code_theme
-  -- Если не указана -c/--cols, то берется ширина превью панели
-  custom_args = "--code-block-style simple --wrap char --link-style inline",
+  custom_args = {
+    "--cols", "64",
+    "--custom-theme", "h1=173,22,124",
+  },
 
   -- Количество строк на один шаг прокрутки. Может принимать "auto", чтобы использовать значение по умолчанию
   scroll_step = 3,
