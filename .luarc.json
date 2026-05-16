@@ -1,4 +1,4 @@
 {
 	"$schema": "https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json",
-	"diagnostics.globals": ["fs", "ui", "ya", "cx", "Command", "rt"]
+	"diagnostics.globals": ["fs", "ui", "ya", "cx", "Command", "rt", "Url"]
 }

@@ -19,11 +19,10 @@ end)
 
 local emit = ya.emit
 
-local MEM = { key = nil, lines = nil, total = 0, last_skip = -1, last_w = 0, last_h = 0 }
-
-local NHASH_BASE = 131
-local NHASH_MOD = 1000003
-local CACHE_PRIME = 10007
+local MEM_LIMIT = 4
+local MEM = { entries = {}, order = {} }
+local LAST = { key = nil, skip = -1, w = 0, h = 0 }
+local MDV_VERSION = nil
 
 local function strip_osc8(s)
 	return s
@@ -79,28 +78,69 @@ local function normalize_scroll_step(value)
 	return math.floor(n), false
 end
 
-local function _nhash(s)
-	local h = 0
-	for i = 1, #s do
-		h = (h * NHASH_BASE + s:byte(i)) % NHASH_MOD
-	end
-	return h
+local function preview_tab_size()
+	return (rt.preview and rt.preview.tab_size) or 4
 end
 
-local function cache_url(job, opts)
-	opts = opts or options() or {}
-	local w = (job.area and job.area.w) or 0
-	local theme = opts.theme or ""
-	local code_theme = opts.code_theme or ""
+local function mdv_version()
+	if MDV_VERSION ~= nil then return MDV_VERSION end
+	local out = Command("mdv")
+		:arg("--version")
+		:stdout(Command.PIPED)
+		:output()
+	MDV_VERSION = out.stdout:match("^%s*(.-)%s*$")
+	return MDV_VERSION
+end
+
+local function render_variant(job, opts, src)
+	opts = opts or {}
 	local custom_args = opts.custom_args
-	local th = _nhash(theme)
-	local cth = _nhash(code_theme)
-	local ch = (custom_args and #custom_args > 0) and _nhash(table.concat(custom_args, "\0")) or 0
-	return ya.file_cache({
+	return table.concat({
+		tostring(job.area and job.area.w or 0),
+		opts.theme or "",
+		opts.code_theme or "",
+		(custom_args and #custom_args > 0) and table.concat(custom_args, "\0") or "",
+		tostring(preview_tab_size()),
+		tostring(src and src.mtime or 0),
+		tostring(src and src.len or 0),
+		mdv_version(),
+	}, "\0")
+end
+
+local function cache_url(job, opts, src)
+	opts = opts or options() or {}
+	local base = ya.file_cache({
 		file = job.file,
-		skip = ((((w * CACHE_PRIME + (th % CACHE_PRIME)) * CACHE_PRIME) + (cth % CACHE_PRIME)) * CACHE_PRIME) +
-			(ch % CACHE_PRIME),
+		skip = 0,
 	})
+	return base and Url(tostring(base) .. "." .. ya.hash(render_variant(job, opts, src)))
+end
+
+local function mem_touch(key)
+	for i = 1, #MEM.order do
+		if MEM.order[i] == key then
+			table.remove(MEM.order, i)
+			break
+		end
+	end
+	MEM.order[#MEM.order + 1] = key
+end
+
+local function mem_get(key)
+	local entry = MEM.entries[key]
+	if entry then mem_touch(key) end
+	return entry
+end
+
+local function mem_put(key, entry)
+	entry.key = key
+	MEM.entries[key] = entry
+	mem_touch(key)
+	while #MEM.order > MEM_LIMIT do
+		local old = table.remove(MEM.order, 1)
+		MEM.entries[old] = nil
+	end
+	return entry
 end
 
 local function build_mdv_args(width, theme, code_theme, custom_args)
@@ -185,15 +225,15 @@ local function render_to_cache(job, opts)
 	opts = opts or options() or {}
 	local theme = opts.theme
 	local code_theme = opts.code_theme
-	local cache = cache_url(job, opts)
+	local src = fs.cha(job.file.url)
+	local cache = cache_url(job, opts, src)
 	if not cache then return true end
 
 	local cha = fs.cha(cache)
-	if cha and cha.len > 0 then
+	if cha and (cha.len > 0 or (src and src.len == 0)) then
 		return true
 	end
 
-	local src = fs.cha(job.file.url)
 	if src and src.len == 0 then
 		return fs.write(cache, "")
 	end
@@ -221,15 +261,15 @@ local function render_to_cache(job, opts)
 	end
 
 	local normalized = strip_osc8(out.stdout)
-	normalized = normalized:gsub("\t", string.rep(" ", (rt.preview and rt.preview.tab_size) or 4))
+	normalized = normalized:gsub("\t", string.rep(" ", preview_tab_size()))
 	return fs.write(cache, normalized)
 end
 
-function M.preload(_, job)
+function M:preload(job)
 	return render_to_cache(job)
 end
 
-function M.load_into_mem(_, job)
+function M:load_into_mem(job)
 	local function build_prefixes_replay(blob)
 		local prefixes, acc, ln = { "" }, {}, 1
 		for line in (blob .. "\n"):gmatch("([^\n]*)\n") do
@@ -256,28 +296,18 @@ function M.load_into_mem(_, job)
 	end
 
 	local meta = fs.cha(job.file.url)
-	local mtime = meta and meta.mtime or 0
 	local opts = options() or {}
-	local theme = opts.theme or ""
-	local code_theme = opts.code_theme or ""
-	local args_token = opts.custom_args and _nhash(table.concat(opts.custom_args, "\0")) or 0
 	local key = table.concat({
 		tostring(job.file.url),
-		tostring(job.area and job.area.w or 0),
-		tostring(mtime),
-		theme,
-		code_theme,
-		tostring(args_token),
+		render_variant(job, opts, meta),
 	}, "#")
 
-	if MEM.key == key and MEM.lines then
-		return MEM
-	end
+	local cached = mem_get(key)
+	if cached then return cached end
 
-	local cache = cache_url(job, opts)
+	local cache = cache_url(job, opts, meta)
 	if not cache then
-		MEM = { key = key, lines = { "cache disabled" }, total = 1, last_skip = -1, last_w = 0, last_h = 0 }
-		return MEM
+		return mem_put(key, { lines = { "cache disabled" }, total = 1 })
 	end
 
 	local blob = read_all(cache)
@@ -317,8 +347,7 @@ function M.load_into_mem(_, job)
 		total = new_len
 	end
 
-	MEM = { key = key, lines = lines, total = total, prefixes = prefixes, last_skip = -1, last_w = 0, last_h = 0 }
-	return MEM
+	return mem_put(key, { lines = lines, total = total, prefixes = prefixes })
 end
 
 function M:peek(job)
@@ -340,17 +369,18 @@ function M:peek(job)
 	local bound = math.max(0, mem.total - area.h)
 	local eff_skip = math.min(skip, bound)
 	if skip > bound and emit then emit("peek", { bound, only_if = file.url, upper_bound = true }) end
-	if mem.last_skip == eff_skip and mem.last_w == area.w and mem.last_h == area.h then return end
+	if LAST.key == mem.key and LAST.skip == eff_skip and LAST.w == area.w and LAST.h == area.h then return end
 
 	local start_line = eff_skip + 1
 	local end_line = math.min(mem.total, start_line + area.h - 1)
 	local prefix = mem.prefixes and mem.prefixes[start_line] or ""
 	show(job, ui.Text.parse(prefix .. table.concat(mem.lines, "\n", start_line, end_line) .. "\27[0m"):area(area))
-	mem.last_skip = eff_skip
-	mem.last_w, mem.last_h = area.w, area.h
+	LAST.key = mem.key
+	LAST.skip = eff_skip
+	LAST.w, LAST.h = area.w, area.h
 end
 
-function M.seek(_, job)
+function M:seek(job)
 	local h = cx.active and cx.active.current and cx.active.current.hovered
 	if not (h and h.url == job.file.url and emit) then
 		return
@@ -373,7 +403,7 @@ function M.seek(_, job)
 	if next_skip ~= current_skip then emit("peek", { next_skip, only_if = job.file.url }) end
 end
 
-function M.setup(_, user)
+function M:setup(user)
 	user = user or {}
 	local theme = user.theme
 	if theme == "" then theme = nil end -- Will be removed in newer versions of mdv
