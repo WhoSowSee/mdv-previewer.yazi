@@ -156,7 +156,9 @@ local function build_mdv_args(width, theme, code_theme, custom_args)
 			"-l", "cut",
 			"--wrap", "word",
 			"--heading-layout", "level",
-			"--smart-indent",
+            "--smart-indent",
+            "--table-smart-indent",
+			"--callout-style", "pretty:show-icons;fold-icons"
 		}
 	end
 
