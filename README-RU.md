@@ -4,7 +4,7 @@
   <i>Просматривайте Markdown, не выходя из yazi</i>
 </p>
 
-https://github.com/user-attachments/assets/c985d2cb-1bc6-43cb-aef7-0596949d1f29
+https://github.com/user-attachments/assets/a624a333-7627-4961-ac73-e6e81bd536d2
 
 > [!TIP]
 > **Английская версия:** [README.md](README.md)

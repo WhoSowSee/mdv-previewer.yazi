@@ -4,7 +4,7 @@
   <i>View Markdown without leaving yazi</i>
 </p>
 
-https://github.com/user-attachments/assets/f216e8d0-bde5-42a6-979e-f5620f779a47
+https://github.com/user-attachments/assets/a624a333-7627-4961-ac73-e6e81bd536d2
 
 > [!TIP]
 > **Russian version:** [README-RU.md](README-RU.md)
