@@ -82,7 +82,7 @@ require("mdv-previewer"):setup({
         srcset="https://starchart.cc/WhoSowSee/mdv-previewer.yazi.svg?variant=custom&background=%23ffffff&axis=%2357606a&line=%230969da"
       />
       <img
-        alt="История звёзд"
+        alt="Star history"
         src="https://starchart.cc/WhoSowSee/mdv-previewer.yazi.svg?variant=custom&background=%23ffffff&axis=%2357606a&line=%230969da"
       />
     </picture>
