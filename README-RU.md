@@ -56,7 +56,7 @@ require("mdv-previewer"):setup({
 
   -- Не рекомендуется использовать этот параметр
   -- Если не указано, используются встроенные безопасные параметры
-  -- Невозможно использовать -m/--monitor, -H/--html, --config-file, -h/--help, -V/--version, -G/--init-config и -p/--pager
+  -- Невозможно использовать --monitor, --html, -F/--config-file, -h/--help, -V/--version, --init-config, -p/--pager и -i/--interactive
   -- Приоритет custom_args выше, чем theme и code_theme
   custom_args = {
     "--cols", "64",

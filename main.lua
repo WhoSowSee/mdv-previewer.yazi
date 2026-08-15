@@ -36,16 +36,20 @@ local function strip_unsupported_args(args)
 	local filtered, i = {}, 1
 	while i <= #args do
 		local token = args[i]
-		local drop = token == "-m" or token == "--monitor" or token:match("^%-%-monitor=")
-			or token == "-H" or token == "--html" or token:match("^%-%-html=")
+		local drop = token == "--monitor"
+			or token == "--html"
+			or token == "-F" or token:match("^%-F.+")
+			or token == "--config-file" or token:match("^%-%-config%-file=")
 			or token == "-h" or token == "--help"
 			or token == "-V" or token == "--version"
-			or token == "-G" or token:match("^%-G.+")
 			or token == "--init-config" or token:match("^%-%-init%-config=")
-			or token == "-p" or token == "--pager" or token:match("^%-%-pager=")
+			or token == "-p" or token == "--pager"
+			or token == "-i" or token == "--interactive"
 		local drop_next_position = token == "--monitor"
-			or token == "--init-config" or token == "-G"
+			or token == "--config-file" or token == "-F"
+			or token == "--init-config"
 			or token == "--pager" or token == "-p"
+			or token == "--interactive" or token == "-i"
 		if drop_next_position then
 			local next_token = args[i + 1]
 			if next_token and not next_token:match("^%-") then
@@ -164,13 +168,15 @@ local function build_mdv_args(width, theme, code_theme, custom_args)
 			"-l", "cut",
 			"--wrap", "word",
 			"--heading-layout", "level",
-            "--smart-indent",
-            "--table-smart-indent",
-            "--render-html",
-            "--pretty-list",
-            "--callout-style", "pretty:show-icons;fold-icons",
-            "--code-block-style", "pretty:show-icons",
-            "--pretty-checkbox", "square"
+			"--smart-indent",
+			"--table-smart-indent",
+			"--render-html",
+			"--pretty-list", "type:nerd-font;size:small",
+			"--callout-style", "pretty:show-icons;fold-icons",
+			"--code-block-style", "pretty:show-name;show-icon",
+			"--pretty-checkbox", "square",
+			"--pretty-definition", "unicode",
+			"--pretty-table",
 		}
 	end
 
