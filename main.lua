@@ -232,12 +232,7 @@ local function split_lines(blob)
 end
 
 local function show(job, widget)
-	ya.preview_widget({
-		area = job.area,
-		file = job.file,
-		mime = job.mime or "text/plain",
-		skip = job.skip or 0,
-	}, widget)
+	ya.preview_widget(job, widget)
 end
 
 
