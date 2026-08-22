@@ -177,6 +177,7 @@ local function build_mdv_args(width, theme, code_theme, custom_args)
 			"--pretty-checkbox", "square",
 			"--pretty-definition", "unicode",
 			"--pretty-table",
+			"--front-matter", "panel",
 		}
 	end
 
