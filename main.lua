@@ -182,7 +182,9 @@ local function build_mdv_args(width, theme, code_theme, custom_args)
 	end
 
 	local has_no_config, has_width, has_theme, has_code_theme = false, false, false, false
+	local has_color = false
 	for _, token in ipairs(args) do
+		if token == "--color" or token:match("^%-%-color=") then has_color = true end
 		local is_width = token == "-c" or token == "--cols" or token:match("^%-c=") or token:match("^%-%-cols=")
 		local is_theme = token == "--theme" or token == "-t" or token:match("^%-%-theme=") or token:match("^%-t=")
 		local is_code_theme = token == "--code-theme" or token == "-T"
@@ -199,6 +201,7 @@ local function build_mdv_args(width, theme, code_theme, custom_args)
 	end
 
 	if not has_no_config then table.insert(args, 1, "--no-config") end
+	if not has_color then args[#args + 1] = "--color=always" end
 	if not has_width then
 		args[#args + 1] = "-c"
 		args[#args + 1] = tostring(width)
