@@ -171,12 +171,12 @@ local function build_mdv_args(width, theme, code_theme, custom_args)
 			"--smart-indent",
 			"--table-smart-indent",
 			"--render-html",
-			"--pretty-list", "type:nerd-font;size:small",
+			"--list-style", "type:nerd-font;size:small",
 			"--callout-style", "pretty:show-icons;fold-icons",
 			"--code-block-style", "pretty:show-name;show-icon",
-			"--pretty-checkbox", "square",
-			"--pretty-definition", "unicode",
-			"--pretty-table",
+			"--checkbox-style", "square",
+			"--definition-marker-style", "unicode",
+			"--table-borders",
 			"--front-matter", "panel",
 		}
 	end
