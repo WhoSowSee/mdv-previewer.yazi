@@ -11,7 +11,7 @@ https://github.com/user-attachments/assets/a624a333-7627-4961-ac73-e6e81bd536d2
 
 > [!IMPORTANT]
 > Необходим Yazi v25.5.28+\
-> Необходим [`mdv`](https://github.com/WhoSowSee/mdv) в `PATH`
+> Необходим [`mdv`](https://github.com/WhoSowSee/mdv) v6.0.0+ в `PATH`
 
 ## Установка
 

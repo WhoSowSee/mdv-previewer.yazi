@@ -31,32 +31,57 @@ local function strip_osc8(s)
 		:gsub("\r", "")
 end
 
+local function strip_short_arg(token)
+	local retained, drop_next_position = "-", false
+	for index = 2, #token do
+		local flag = token:sub(index, index)
+		local remaining = token:sub(index + 1)
+		if flag == "F" then
+			drop_next_position = remaining == ""
+			break
+		elseif flag:match("[hVip]") then
+			drop_next_position = (flag == "i" or flag == "p") and remaining == ""
+			if remaining:sub(1, 1) == "=" then break end
+		elseif flag:match("[EnBrIS]") then
+			retained = retained .. flag
+		else
+			retained = retained .. token:sub(index)
+			break
+		end
+	end
+	return retained ~= "-" and retained or nil, drop_next_position
+end
+
 local function strip_unsupported_args(args)
 	if not args[1] then return args end
+	local blocked_long_args = {
+		["--monitor"] = true,
+		["--html"] = false,
+		["--config-file"] = true,
+		["--help"] = false,
+		["--version"] = false,
+		["--init-config"] = true,
+		["--pager"] = true,
+		["--interactive"] = true,
+	}
 	local filtered, i = {}, 1
 	while i <= #args do
 		local token = args[i]
-		local drop = token == "--monitor"
-			or token == "--html"
-			or token == "-F" or token:match("^%-F.+")
-			or token == "--config-file" or token:match("^%-%-config%-file=")
-			or token == "-h" or token == "--help"
-			or token == "-V" or token == "--version"
-			or token == "--init-config" or token:match("^%-%-init%-config=")
-			or token == "-p" or token == "--pager"
-			or token == "-i" or token == "--interactive"
-		local drop_next_position = token == "--monitor"
-			or token == "--config-file" or token == "-F"
-			or token == "--init-config"
-			or token == "--pager" or token == "-p"
-			or token == "--interactive" or token == "-i"
+		local name = token:match("^(%-%-[^=]+)")
+		local drop_next_position = blocked_long_args[name]
+		if drop_next_position ~= nil then
+			drop_next_position = drop_next_position and token == name
+			token = nil
+		elseif token:match("^%-[^%-]") then
+			token, drop_next_position = strip_short_arg(token)
+		end
 		if drop_next_position then
 			local next_token = args[i + 1]
 			if next_token and not next_token:match("^%-") then
 				i = i + 1
 			end
 		end
-		if not drop then filtered[#filtered + 1] = token end
+		if token then filtered[#filtered + 1] = token end
 		i = i + 1
 	end
 	return filtered
@@ -189,7 +214,7 @@ local function build_mdv_args(width, theme, code_theme, custom_args)
 		local is_theme = token == "--theme" or token == "-t" or token:match("^%-%-theme=") or token:match("^%-t=")
 		local is_code_theme = token == "--code-theme" or token == "-T"
 			or token:match("^%-%-code%-theme=") or token:match("^%-T=")
-		if token == "--no-config" then
+		if token == "--no-config" or token:match("^%-[EnBrIS]*n") then
 			has_no_config = true
 		elseif not has_width and is_width then
 			has_width = true
