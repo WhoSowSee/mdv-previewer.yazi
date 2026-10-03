@@ -68,22 +68,24 @@ require("mdv-previewer"):setup({
 })
 ```
 
-## История звёзд
+---
 
+<!-- Локальная история звёзд, обновляется через .github/workflows/star-history.yml. -->
 <p align="center">
-  <a href="https://starchart.cc/WhoSowSee/mdv-previewer.yazi">
+  <a href="https://github.com/WhoSowSee/mdv-previewer.yazi/stargazers">
     <picture>
       <source
         media="(prefers-color-scheme: dark)"
-        srcset="https://starchart.cc/WhoSowSee/mdv-previewer.yazi.svg?variant=custom&background=%230d1117&axis=%238b949e&line=%232f81f7"
+        srcset=".github/assets/star-history-dark-ru.svg"
       />
       <source
         media="(prefers-color-scheme: light)"
-        srcset="https://starchart.cc/WhoSowSee/mdv-previewer.yazi.svg?variant=custom&background=%23ffffff&axis=%2357606a&line=%230969da"
+        srcset=".github/assets/star-history-light-ru.svg"
       />
       <img
         alt="История звёзд"
-        src="https://starchart.cc/WhoSowSee/mdv-previewer.yazi.svg?variant=custom&background=%23ffffff&axis=%2357606a&line=%230969da"
+        src=".github/assets/star-history-light-ru.svg"
+        width="820"
       />
     </picture>
   </a>
