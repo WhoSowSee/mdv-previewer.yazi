@@ -125,6 +125,7 @@ local function mdv_version()
 		:arg("--version")
 		:stdout(Command.PIPED)
 		:output()
+	if not out or (out.status and not out.status.success) then return "" end
 	MDV_VERSION = out.stdout:match("^%s*(.-)%s*$")
 	return MDV_VERSION
 end
@@ -297,7 +298,9 @@ local function render_to_cache(job, opts)
 		:output()
 
 	if not out then
-		return true, tostring(err or "mdv: failed to start")
+		local msg = "mdv: failed to start. Make sure mdv is installed and available in PATH"
+		if err then msg = msg .. "\n" .. tostring(err) end
+		return true, msg
 	elseif out.status and not out.status.success then
 		local msg = (out.stderr and out.stderr ~= "") and out.stderr or "mdv: rendering error"
 		fs.write(cache, msg)
