@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="820" height="420" viewBox="0 0 820 420" role="img" aria-labelledby="chart-title" font-family="-apple-system,Segoe UI,Helvetica,Arial,sans-serif">
-<title id="chart-title">WhoSowSee/mdv-previewer.yazi — История звёзд: 7</title>
+<title id="chart-title">WhoSowSee/mdv-previewer.yazi — История звёзд: 8</title>
 <rect width="820" height="420" rx="6" fill="#ffffff"/>
 <text x="76" y="30" fill="#24292f" font-size="17" font-weight="600">История звёзд</text>
-<text x="792" y="30" text-anchor="end" fill="#57606a" font-size="13">WhoSowSee/mdv-previewer.yazi &#183; Звёзд: 7</text>
+<text x="792" y="30" text-anchor="end" fill="#57606a" font-size="13">WhoSowSee/mdv-previewer.yazi &#183; Звёзд: 8</text>
 <line x1="76" y1="368.0" x2="792" y2="368.0" stroke="#eaecef"/>
 <text x="68" y="372.0" text-anchor="end" fill="#57606a" font-size="11">0</text>
 <line x1="76" y1="307.2" x2="792" y2="307.2" stroke="#eaecef"/>
@@ -16,12 +16,12 @@
 <line x1="76" y1="64.0" x2="792" y2="64.0" stroke="#eaecef"/>
 <text x="68" y="68.0" text-anchor="end" fill="#57606a" font-size="11">10</text>
 <text x="76.0" y="388" text-anchor="start" fill="#57606a" font-size="11">16 май</text>
-<text x="255.0" y="388" text-anchor="middle" fill="#57606a" font-size="11">06 июн</text>
-<text x="434.0" y="388" text-anchor="middle" fill="#57606a" font-size="11">27 июн</text>
-<text x="613.0" y="388" text-anchor="middle" fill="#57606a" font-size="11">18 июл</text>
-<text x="792.0" y="388" text-anchor="end" fill="#57606a" font-size="11">08 авг</text>
+<text x="255.0" y="388" text-anchor="middle" fill="#57606a" font-size="11">20 июн</text>
+<text x="434.0" y="388" text-anchor="middle" fill="#57606a" font-size="11">26 июл</text>
+<text x="613.0" y="388" text-anchor="middle" fill="#57606a" font-size="11">30 авг</text>
+<text x="792.0" y="388" text-anchor="end" fill="#57606a" font-size="11">05 окт</text>
 <line x1="76" y1="368" x2="792" y2="368" stroke="#d0d7de" stroke-width="1.5"/>
-<polygon points="76,368 76.0,337.6 144.2,307.2 186.8,276.8 280.6,246.4 365.8,216.0 493.7,185.6 792.0,155.2 792.0,368" fill="#2f81f7" fill-opacity="0.12"/>
-<polyline points="76.0,337.6 144.2,307.2 186.8,276.8 280.6,246.4 365.8,216.0 493.7,185.6 792.0,155.2" fill="none" stroke="#2f81f7" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="792.0" cy="155.2" r="3.5" fill="#2f81f7"/>
+<polygon points="76,368 76.0,337.6 116.3,307.2 141.5,276.8 197.0,246.4 247.4,216.0 323.1,185.6 499.5,155.2 792.0,124.8 792.0,368" fill="#2f81f7" fill-opacity="0.12"/>
+<polyline points="76.0,337.6 116.3,307.2 141.5,276.8 197.0,246.4 247.4,216.0 323.1,185.6 499.5,155.2 792.0,124.8" fill="none" stroke="#2f81f7" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="792.0" cy="124.8" r="3.5" fill="#2f81f7"/>
 </svg>
