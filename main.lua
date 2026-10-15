@@ -1,4 +1,4 @@
---- @since 25.5.28
+--- @since 26.1.4
 
 local M = {}
 
@@ -286,7 +286,7 @@ local function render_to_cache(job, opts)
 	local width = job.area and job.area.w or 0
 	local custom_args = opts.custom_args
 	local cmd_args = build_mdv_args(width, theme, code_theme, custom_args)
-	cmd_args[#cmd_args + 1] = tostring(job.file.url)
+	cmd_args[#cmd_args + 1] = tostring(job.file.path)
 
 	local command = Command("mdv")
 	for _, arg in ipairs(cmd_args) do

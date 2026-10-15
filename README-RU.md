@@ -10,7 +10,7 @@ https://github.com/user-attachments/assets/d20d1857-bbd4-4d36-8bda-a480bbc79bf0
 > **Английская версия:** [README.md](README.md)
 
 > [!IMPORTANT]
-> Необходим Yazi v25.5.28+\
+> Необходим Yazi v26.1.4+\
 > Необходим [`mdv`](https://github.com/WhoSowSee/mdv) v6.0.0+ в `PATH`
 
 ## Установка

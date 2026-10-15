@@ -10,7 +10,7 @@ https://github.com/user-attachments/assets/d20d1857-bbd4-4d36-8bda-a480bbc79bf0
 > **Russian version:** [README-RU.md](README-RU.md)
 
 > [!IMPORTANT]
-> Requires Yazi v25.5.28+\
+> Requires Yazi v26.1.4+\
 > Requires [`mdv`](https://github.com/WhoSowSee/mdv) v6.0.0+ in `PATH`
 
 ## Installation
